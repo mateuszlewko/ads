@@ -40,7 +40,7 @@ class vEB {
     }
   }
 
-  bool find(T key) { return succ(key - 1) == key; }
+  bool lookup(T key) { return succ(key - 1) == key; }
 
   void insert(T key) {
     if (min > max) {
@@ -87,7 +87,7 @@ int main() {
   std::cout << "succ(1) = " << veb_set.succ(1) << std::endl
             << "succ(9) = " << veb_set.succ(9) << std::endl
             << "succ(1000) = " << veb_set.succ(1000) << std::endl
-            << "find(1000) = " << veb_set.find(1000) << std::endl
-            << "find(500001) = " << veb_set.find(500001) << std::endl
-            << "find(1) = " << veb_set.find(1) << std::endl;
+            << "find(1000) = " << veb_set.lookup(1000) << std::endl
+            << "find(500001) = " << veb_set.lookup(500001) << std::endl
+            << "find(1) = " << veb_set.lookup(1) << std::endl;
 }
