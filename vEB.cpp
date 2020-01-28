@@ -54,8 +54,6 @@ class vEB {
     auto high = get_high(key);
     auto low = get_low(key);
 
-    std::cout << "high = " << high << ", bs.size: " << buckets.size()
-              << std::endl;
     buckets[high].insert(low);
 
     if (buckets[high].min == buckets[high].max) {
@@ -63,26 +61,15 @@ class vEB {
     }
   }
 
-  void erase(T key) {}
-
   T succ(T key) {
-    if (key < min) {
-      std::cout << "min = " << min << std::endl;
-      return min;
-    }
-    if (key >= max) {
-      std::cout << "u = " << u << std::endl;
-      return u;
-    }
+    if (key < min) return min;
+    if (key >= max) return u;
 
     auto high = get_high(key);
     auto low = get_low(key);
 
     if (low < buckets[high].max) {
-      auto res = buckets[high].succ(low);
-      std::cout << "high = " << high << ", high << exp = " << (high << u_exp_low)
-                << ", succ = " << res << std::endl;
-      return (high << u_exp_low) + res;
+      return (high << u_exp_low) + buckets[high].succ(low);
     }
 
     auto next_high = non_empty_high->succ(high);
@@ -99,5 +86,8 @@ int main() {
 
   std::cout << "succ(1) = " << veb_set.succ(1) << std::endl
             << "succ(9) = " << veb_set.succ(9) << std::endl
-            << "succ(1000) = " << veb_set.succ(1000) << std::endl;
+            << "succ(1000) = " << veb_set.succ(1000) << std::endl
+            << "find(1000) = " << veb_set.find(1000) << std::endl
+            << "find(500001) = " << veb_set.find(500001) << std::endl
+            << "find(1) = " << veb_set.find(1) << std::endl;
 }
