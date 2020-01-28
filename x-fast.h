@@ -1,8 +1,12 @@
+#pragma once
+
 #include <cmath>
 #include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include "interface.h"
 
 template <typename T>
 struct node {
@@ -14,7 +18,7 @@ struct node {
 };
 
 template <typename T>
-class x_fast {
+class x_fast : public fast_set<T> {
   const int u_exp;
 
   typedef std::unordered_map<T, std::shared_ptr<node<T>>> level;
@@ -36,6 +40,34 @@ class x_fast {
     }
 
     return beg;
+  }
+
+  std::shared_ptr<node<T>> pred_node(T key) {
+    auto node = find_leaf_node(key);
+    if (node && node->key >= key) return node->prev;
+
+    return node;
+  }
+
+  std::shared_ptr<node<T>> succ_node(T key) {
+    auto node = find_leaf_node(key);
+    if (node && node->key <= key) return node->next;
+
+    return node;
+  }
+
+  std::shared_ptr<node<T>> find_leaf_node(T key) {
+    auto lvl = lcp_level(key);
+    auto node = levels[lvl][key >> (u_exp - lvl)];
+
+    if (!node->leaf) {
+      if (!node->prev && !node->next) return nullptr;
+
+      bool right_child = key & ((T)1 << (u_exp - lvl - 1));
+      node = right_child ? node->next : node->prev;
+    }
+
+    return node;
   }
 
  public:
@@ -97,34 +129,6 @@ class x_fast {
     }
   }
 
-  std::shared_ptr<node<T>> pred_node(T key) {
-    auto node = find_leaf_node(key);
-    if (node && node->key >= key) return node->prev;
-
-    return node;
-  }
-
-  std::shared_ptr<node<T>> succ_node(T key) {
-    auto node = find_leaf_node(key);
-    if (node && node->key <= key) return node->next;
-
-    return node;
-  }
-
-  std::shared_ptr<node<T>> find_leaf_node(T key) {
-    auto lvl = lcp_level(key);
-    auto node = levels[lvl][key >> (u_exp - lvl)];
-
-    if (!node->leaf) {
-      if (!node->prev && !node->next) return nullptr;
-
-      bool right_child = key & ((T)1 << (u_exp - lvl - 1));
-      node = right_child ? node->next : node->prev;
-    }
-
-    return node;
-  }
-
   T succ(T key) {
     auto node = succ_node(key);
     return node ? node->key : ((T)1 << u_exp);
@@ -139,26 +143,3 @@ class x_fast {
     for (auto [_, node] : levels[u_exp]) node->next = node->prev = nullptr;
   }
 };
-
-int main() {
-  auto s = x_fast<int>(22);
-  s.insert(4);
-  s.insert(10);
-  s.insert(11);
-  s.insert(1000);
-  s.insert(500001);
-
-  std::cout << "succ(1) = " << s.succ(1) << std::endl
-            << "succ(9) = " << s.succ(9) << std::endl
-            << "succ(10) = " << s.succ(10) << std::endl
-            << "pred(10) = " << s.pred(10) << std::endl
-            << "pred(11) = " << s.pred(11) << std::endl
-            << "pred(1) = " << s.pred(1) << std::endl
-            << "pred(1000) = " << s.pred(1000) << std::endl
-            << "succ(11) = " << s.succ(11) << std::endl
-            << "succ(510000) = " << s.succ(510000) << std::endl
-            << "succ(1000) = " << s.succ(1000) << std::endl
-            << "find(1000) = " << s.lookup(1000) << std::endl
-            << "find(500001) = " << s.lookup(500001) << std::endl
-            << "find(1) = " << s.lookup(1) << std::endl;
-}
