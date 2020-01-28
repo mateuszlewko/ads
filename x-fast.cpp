@@ -1,33 +1,8 @@
-// #include <cassert>
-// #include <cmath>
-// #include <iostream>
-// #include <memory>
-// #include <unordered_map>
-// #include <vector>
-
-#include <bits/stdc++.h>
-using namespace std;
-
-#if DEBUG
-#define error(args...)                       \
-  {                                          \
-    string _s = #args;                       \
-    replace(_s.begin(), _s.end(), ',', ' '); \
-    stringstream _ss(_s);                    \
-    istream_iterator<string> _it(_ss);       \
-    err(_it, args);                          \
-  }
-void err(istream_iterator<string>) {}
-template <typename T, typename... Args>
-void err(istream_iterator<string> it, T a, Args... args) {
-  cerr << *it << " = " << a << endl;
-  err(++it, args...);
-}
-#else
-#define error(...) \
-  do {             \
-  } while (0)
-#endif
+#include <cmath>
+#include <iostream>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 template <typename T>
 struct node {
@@ -83,18 +58,12 @@ class x_fast {
     auto curr = std::make_shared<node<T>>(key, true);
     levels[u_exp][key] = curr;
 
-    // std::cout << "inserting = " << key << std::endl;
-
     if (prev) {
-      assert(prev->leaf);
-      // std::cout << "prev is = " << prev->key << std::endl;
       curr->prev = prev;
       prev->next = curr;
     }
 
     if (next) {
-      // std::cout << "next is = " << next->key << std::endl;
-      assert(next->leaf);
       curr->next = next;
       next->prev = curr;
     }
@@ -107,128 +76,50 @@ class x_fast {
         auto lvl_node = std::make_shared<node<T>>(key);
         levels[i][prefix] = lvl_node;
 
-        // std::cout << "inserting node, lvl = " << i << ", prefix = " << prefix
-        //           << ", key = " << key << std::endl;
-
         if (prefix & 1) {
           parent->next = lvl_node;
-          // update left descendant pointer
-          // if (!parent->prev || parent->prev->key > key) {
-          //   parent->prev = curr;
-          // }
         } else {
           parent->prev = lvl_node;
-
-          // // update right descendant pointer
-          // if (!parent->next || parent->next->key < key) {
-          //   parent->next = curr;
-          // }
         }
       }
 
       if (prefix & 1) {
-        // parent->next = lvl_node;
         // update left descendant pointer
         if (!parent->prev || parent->prev->key > key) {
           parent->prev = curr;
         }
       } else {
-        // parent->prev = lvl_node;
-
         // update right descendant pointer
         if (!parent->next || parent->next->key < key) {
           parent->next = curr;
         }
       }
     }
-
-    // auto parent = levels[u_exp - 1][key >> 1];
-    // if (key & 1) {
-    //   if (!parent->prev || parent->prev->key > key) {
-    //     parent->prev = curr;
-    //   }
-    // } else {
-    //   if (!parent->next || parent->next->key < key) {
-    //     parent->next = curr;
-    //   }
-    // }
   }
 
-  std::shared_ptr<node<T>> succ_node(T key) {
-    auto lvl = lcp_level(key);
-    auto node = levels[lvl][key >> (u_exp - lvl)];
-
-    if (!node->leaf) {
-      // if (node->prev) {
-      //   std::cout << "key = " << key << ", prev = " << node->prev->key
-      //             << "leaf = " << node->prev->leaf << ", lvl = " << lvl
-      //             << std::endl;
-      // }
-
-      // std::cout << "key = " << key << ", lvl = " << lvl
-      //           << ", node.key = " << node->key << std::endl;
-
-      if (!node->prev && !node->next) {
-        // std::cout << "both null" << std::endl;
-        return nullptr;
-      }
-
-      if (key & (1 << (u_exp - lvl - 1)))
-        node = node->next;
-      else
-        node = node->prev;
-
-      assert(node);
-      assert(node->leaf);
-      // node = node->prev && node->prev->leaf ? node->prev : node->next;
-    }
-
-    if (node->key <= key) {
-      // std::cout << "key = " << key << ", node.key = " << node->key
-      //           << "is_next = " << !!node->next << std::endl;
-
-      // if (node->next)
-      //   std::cout << "and next is = " << node->next->key << std::endl;
-
-      return node->next;
-    }
+  std::shared_ptr<node<T>> pred_node(T key) {
+    auto node = find_leaf_node(key);
+    if (node && node->key >= key) return node->prev;
 
     return node;
   }
 
-  std::shared_ptr<node<T>> pred_node(T key) {
+  std::shared_ptr<node<T>> succ_node(T key) {
+    auto node = find_leaf_node(key);
+    if (node && node->key <= key) return node->next;
+
+    return node;
+  }
+
+  std::shared_ptr<node<T>> find_leaf_node(T key) {
     auto lvl = lcp_level(key);
     auto node = levels[lvl][key >> (u_exp - lvl)];
 
-    // error(lvl, key, node->key, node->leaf);
-
     if (!node->leaf) {
-      if (node->prev) {
-        error(node->prev->key);
-        // std::cout << "key = " << key << ", prev = " << node->prev->key
-        //           << "leaf = " << node->prev->leaf << ", lvl = " << lvl
-        //           << std::endl;
-      }
+      if (!node->prev && !node->next) return nullptr;
 
-      if (node->next) error(node->next->key, node->next->leaf);
-
-      if (!node->prev && !node->next) {
-        return nullptr;
-      }
-
-      if (key & ((T)1 << (u_exp - lvl - 1))) {
-        node = node->next;
-      } else {
-        node = node->prev;
-      }
-
-      assert(node);
-      assert(node->leaf);
-      // node = node->prev && node->prev->leaf ? node->prev : node->next;
-    }
-
-    if (node->key >= key) {
-      return node->prev;  // ? node->prev : nullptr;
+      bool right_child = key & ((T)1 << (u_exp - lvl - 1));
+      node = right_child ? node->next : node->prev;
     }
 
     return node;
@@ -236,9 +127,9 @@ class x_fast {
 
   T succ(T key) {
     auto node = succ_node(key);
-
     return node ? node->key : ((T)1 << u_exp);
   }
+
   T pred(T key) {
     auto node = pred_node(key);
     return node ? node->key : -((T)1 << u_exp);
