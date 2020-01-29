@@ -1,0 +1,99 @@
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+\usepackage{polski}
+
+\usepackage{pgfplots}
+\pgfplotsset{width=18cm,compat=1.9}
+%\usepgfplotslibrary{external}
+%\tikzexternalize
+
+\begin{document}
+
+\section*{Porównanie wydajności drzew van Emde Boasa, x-fast oraz y-fast}
+Mateusz Lewko \\
+
+\textbf{Wykonane prace} Zaimplementowałem trzy struktury danych:
+\begin{itemize}
+  \item drzewo van Emde Boasa (\texttt{v-eb.h}),
+  \item x-fast trie (\texttt{x-fast.h}),
+  \item y-fast trie wykorzystujące x-fast oraz drzewo bst (\texttt{y-fast.h}),
+  \item oraz wrapper na std::set (dla porównania, jest w pliku (\texttt{test.h})).
+\end{itemize}
+Każda z nich implementuje taki sam interfejs (lookup, successor,
+insert --- plik (\texttt{interface.h})).
+Konstruktor każdej struktury przyjmuje wykładnik $k$ rozmiaru uniwersum $U = 2^k$.
+Jeśli w strukturze nie ma następnika dla danego zapytania, to zwracane jest $U$.
+Zarządzanie pamięcią jest zapewnione przez użycie shared pointerów. Skutkiem ubocznym
+użycia shared pointerów jest duża stała wykonywanych operacji.
+
+Poprawność zaimplementowanych metod jest sprawdzana poprzez wypisanie xora
+wyników operacji \textit{successor} dla każdej struktury.
+
+\textbf{Testy wydajności}
+Zaimplementowałem dwa typy testów. W pierwszym, dla danego $N$ losowane jest
+$N$ liczb jako wejście do operacji insert, a następnie $N$ liczb na 
+których kolejno wykonywane są zapytania o następnika.
+
+\textbf{Kompilacja} Wszystkie testy można skompilować jednym poleceniem w
+systemie linux: \texttt{g++ test.cpp -o test -O3 -Wall -Wextra -std=c++17},
+a następnie uruchomić: \texttt{./test}.
+
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{semilogxaxis}[
+        title={Test 1. N insertów, a następnie N zapytań o następnika},
+        xlabel={Wartość N},
+        ylabel={Czas działania w sekundach},
+        xmin=100000, xmax=12000000,
+        ymin=0, ymax=60,
+        xtick={100000, 1000000, 2000000, 4000000, 8000000, 12000000},
+        ytick={1, 5, 10, 15, 30, 45, 60 },
+        legend pos=north west,
+        ymajorgrids=true,
+        grid style=dashed,
+      ]
+
+
+      \addplot[
+        color=blue,
+        mark=square,
+      ]
+      coordinates {
+          (100000, 0.04)(1000000, 0.62)(2000000, 1.4)(4000000, 2.66)(8000000, 4.89)
+        };
+
+      \addplot[
+        color=red,
+        mark=square,
+      ]
+      coordinates {
+          (100000, 0.37)(1000000, 3.81)(2000000, 6.69)(4000000, 11.18)(8000000, 17.74)
+        };
+
+      \addplot[
+        color=green,
+        mark=square,
+      ]
+      coordinates {
+          (100000, 0.24)(1000000, 4.4)(2000000, 9.04)(4000000, 17.92)(8000000, 33.27)
+        };
+
+      \addplot[
+        color=brown,
+        mark=square,
+      ]
+      coordinates {
+          (100000, 0.03)(1000000, 0.88)(2000000, 2.79)(4000000, 6.73)(8000000, 15.39)
+        };
+
+      \legend{vEB, x-fast, y-fast, std::set}
+
+    \end{semilogxaxis}
+  \end{tikzpicture}
+\end{figure}
+
+\end{document}

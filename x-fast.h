@@ -62,7 +62,8 @@ class x_fast : public fast_set<T> {
     //           << (key >> (u_exp - lvl)) << std::endl;
 
     auto node = levels[lvl][key >> (u_exp - lvl)];
-
+    if (!node) return nullptr;
+    
     if (!node->leaf) {
       if (!node->prev && !node->next) return nullptr;
 
