@@ -58,7 +58,7 @@ int test1(std::shared_ptr<fast_set<int>> s, int n, std::string ds_name) {
 }
 
 int main() {
-  int u_exp = 21;
+  int u_exp = 24;
   int u = 1 << u_exp;
 
   std::shared_ptr<fast_set<int>> veb = std::make_shared<v_eb<int>>(u_exp);
@@ -67,42 +67,42 @@ int main() {
   std::shared_ptr<fast_set<int>> sw = std::make_shared<set_wrapper<int>>(u_exp);
 
   srand(123);
-  for (int i = 0; i < 100; i++) {
-    int x = rand() % 100;
-    int y = rand() % 100;
+  // for (int i = 0; i < 100000; i++) {
+  //   int x = rand() % 100000;
+  //   int y = rand() % 100000;
 
-    std::cout << x << ", ";
+  //   std::cout << x << ", ";
 
-    sw->insert(x);
-    veb->insert(x);
-    int a1 = sw->succ(y);
-    std::cout << "-----\n";
-    int a2 = veb->succ(y);
+  //   sw->insert(x);
+  //   yf->insert(x);
+  //   int a1 = sw->succ(y);
+  //   std::cout << "-----\n";
+  //   int a2 = yf->succ(y);
 
-    if (a1 != a2) {
-      std::cout << "WA on query = " << y << "\n";
-      std::cout << "\n" << a1 << "\n" << a2 << std::endl;
-      return 1;
-    }
-  }
+  //   if (a1 != a2) {
+  //     std::cout << "WA on query = " << y << "\n";
+  //     std::cout << "\n" << a1 << "\n" << a2 << std::endl;
+  //     return 1;
+  //   }
+  // }
 
   // for (int y : data) {
   //   printf("%d\n%d\n--------\n", yf->succ(y), sw->succ(y));
   // }
 
-  // std::cout << "Initalized data structures.";
+  std::cout << "Initalized data structures.";
 
-  // int N[] = {10000, 1000000, 10000000, 15000000};
+  int N[] = {10000, 1000000, 10000000, 15000000};
 
-  // for (int i = 0; i < 4; i++) {
-  //   int n = N[i];
+  for (int i = 0; i < 4; i++) {
+    int n = N[i];
 
-  //   init_test1(n, u);
-  //   std::cout << "output xor = " << test1(veb, n, "vEB") << std::endl;
-  //   std::cout << "output xor = " << test1(xf, n, "x-fast") << std::endl;
-  //   std::cout << "output xor = " << test1(yf, n, "y-fast") << std::endl;
-  //   std::cout << "output xor = " << test1(sw, n, "std::set") << std::endl;
-  // }
+    init_test1(n, u);
+    std::cout << "output xor = " << test1(veb, n, "vEB") << std::endl;
+    std::cout << "output xor = " << test1(xf, n, "x-fast") << std::endl;
+    std::cout << "output xor = " << test1(yf, n, "y-fast") << std::endl;
+    std::cout << "output xor = " << test1(sw, n, "std::set") << std::endl;
+  }
 
   // init_test1(100000, u);
   // cout << test1(veb, 100000)

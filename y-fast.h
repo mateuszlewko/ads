@@ -27,7 +27,7 @@ class y_fast : public fast_set<T> {
     std::set<T> sets[2];
 
     for (auto key : s) {
-      int side = i++ < max_load ? 0 : 1;
+      int side = i++ < max_load / 2 ? 0 : 1;
       if (key == repr || new_reprs[side] == -1) new_reprs[side] = key;
 
       sets[side].insert(key);
@@ -35,6 +35,11 @@ class y_fast : public fast_set<T> {
 
     bottom[new_reprs[0]] = sets[0];
     bottom[new_reprs[1]] = sets[1];
+
+    if (new_reprs[0] == repr)
+      top.insert(new_reprs[1]);
+    else
+      top.insert(new_reprs[0]);
   }
 
  public:
@@ -42,7 +47,9 @@ class y_fast : public fast_set<T> {
       : u_exp(_u_exp), max_load(2 * (int)std::log2(u_exp)), top(u_exp) {}
 
   void insert(T key) {
-    auto repr = top.succ(key);
+    if (lookup(key)) return;
+
+    auto repr = succ_tree(key);
     if (!bottom.count(repr)) {
       top.insert(key);
       repr = key;
@@ -65,23 +72,34 @@ class y_fast : public fast_set<T> {
   }
 
   T succ(T key) {
-    T next = top.succ(key);
-    T prev = top.pred(key);
-
-    T res = -((T)1 << u_exp);
-    if (bottom.count(next)) {
-      auto b = bottom[next];
-      auto it = b.upper_bound(key);
-      if (it != b.end()) res = std::max(res, *it);
-    }
+    T prev = top.pred(key + 1);
 
     if (bottom.count(prev)) {
       auto b = bottom[prev];
       auto it = b.upper_bound(key);
-      if (it != b.end()) res = std::max(res, *it);
+      if (it != b.end()) return *it;
     }
 
-    if (res == -((T)1 << u_exp)) return (T)1 << u_exp;
-    return res;
+    T next = top.succ(key);
+    if (bottom.count(next)) {
+      auto b = bottom[next];
+      auto it = b.upper_bound(key);
+      if (it != b.end()) return *it;
+    }
+
+    return (T)1 << u_exp;
+  }
+
+  // Returns represant of tree containing key succesor
+  T succ_tree(T key) {
+    T prev = top.pred(key + 1);
+
+    if (bottom.count(prev)) {
+      auto b = bottom[prev];
+      auto it = b.upper_bound(key);
+      if (it != b.end()) return prev;
+    }
+
+    return top.succ(key);
   }
 };

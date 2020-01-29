@@ -65,9 +65,6 @@ class v_eb : public fast_set<T> {
     auto high = get_high(key);
     auto low = get_low(key);
 
-    // std::cout << "high = " << high << ", sz = " << buckets.size()
-    //           << ", key = " << key << std::endl;
-
     buckets[high].insert(low);
 
     if (buckets[high].min == buckets[high].max) {
@@ -76,9 +73,6 @@ class v_eb : public fast_set<T> {
   }
 
   T succ(T key) {
-    // std::cout << "key = " << key << ", min = " << min << ", max = " << max
-    //           << std::endl;
-
     if (key < min) return min;
     if (u == 2 && max > key) return max;
     if (key >= max || u == 2) return u;
@@ -86,31 +80,11 @@ class v_eb : public fast_set<T> {
     auto high = get_high(key);
     auto low = get_low(key);
 
-    // std::cout << "high = " << high << ", low = " << low
-    //           << ", b[high].max = " << buckets[high].max << ", key = " << key
-    //           << ", u_exp = " << u_exp << std::endl;
-
     if (low < buckets[high].max) {
-      auto r = buckets[high].succ(low);
-
-      // if (r >= (1 << u_exp_low)) return u;
-
-      return (high << u_exp_low) + r;
+      return (high << u_exp_low) + buckets[high].succ(low);
     }
 
     auto next_high = non_empty_high->succ(high);
-    // std::cout << "next_high = " << next_high << std::endl;
-    // if (next_high >= (int)buckets.size()) {
-    //   std::cout << "can't use next\n";
-
-    //   for (int i = 0; i < (1 << u_exp_high); i++) {
-    //     std::cout << non_empty_high->lookup(i) << " ";
-    //   }
-    //   std::cout << std::endl;
-
-    //   return max;
-    // }
-
     return (next_high << u_exp_low) + buckets[next_high].min;
   }
 };

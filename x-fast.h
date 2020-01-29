@@ -58,6 +58,9 @@ class x_fast : public fast_set<T> {
 
   std::shared_ptr<node<T>> find_leaf_node(T key) {
     auto lvl = lcp_level(key);
+    // std::cout << "key = " << key << ", u_exp = " << u_exp << ", lvl = " << lvl
+    //           << (key >> (u_exp - lvl)) << std::endl;
+
     auto node = levels[lvl][key >> (u_exp - lvl)];
 
     if (!node->leaf) {
