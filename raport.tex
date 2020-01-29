@@ -18,7 +18,7 @@ Mateusz Lewko \\
 Zaimplementowałem trzy struktury danych z wykładu:
 
 \begin{itemize}
-  \item drzewo van Emde Boasa (\texttt{v-eb.h}),
+  \item drzewo van Emde Boasa (\texttt{v-eb.h}), 
   \item x-fast trie (\texttt{x-fast.h}),
   \item y-fast trie wykorzystujące x-fast oraz drzewo bst (\texttt{y-fast.h}),
 \end{itemize}
@@ -53,12 +53,12 @@ bardzo duże zużycie pamięci oznacza małą przydatność w praktyce oraz dłu
 tworzenia struktury (alokowanie pamięci). 
 Implementacja drzewa y-fast okazała się mieć na tyle dużą
 stałą, że jej sumaryczny czas działania jest większy niż struktury std::set z biblioteki
-standardowej C++ (o gorszej złożoności). 
-Drzewa x-fast wypadły najlepiej pod względem czasu działa i wyprzedzają std::set już
+standardowej C++ (o gorszej złożoności operacji successor). 
+Drzewa x-fast wypadły najlepiej pod względem czasu wykonania i wyprzedzają std::set już
 dla danych rzędu $2 * 10^6$.
 
 Na końcu pliku \texttt{test.cpp} znajduje się zakomentowany wynik programu.
-Czasy działa poszczególnych operacji zostały przedstawione na poniższych 
+Czasy działania poszczególnych operacji zostały przedstawione na poniższych 
 wykresach. 
 
 \begin{figure}
