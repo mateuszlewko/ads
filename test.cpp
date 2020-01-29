@@ -68,7 +68,7 @@ int main() {
 
   srand(123);
 
-  std::cout << "Initalized data structures.";
+  std::cout << "Initalized data structures.\n";
 
   int N[] = {10000, 1000000, 8000000, 12000000};
 
